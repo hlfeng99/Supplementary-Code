@@ -1,0 +1,636 @@
+
+#R scripts for submission (ID: NCOMMS-22-36216-T)
+# R version 4.0.4
+# R studio version 1.4.1717
+
+
+# import database ----------------------------------------------------------------
+setwd("F:/ukb timing physical activity/NC R1/code R1")#Set Working Directory! such as setwd("C:/Users/Desktop/data/")
+
+FullSample.Imputed <- readRDS("FullSampleSimulated.Imputed.rds")
+CompleteSample <- readRDS("CompleteSampleSimulated.rds")
+FullSample.Unimputed <- readRDS("FullSampleSimulated.Unimputed.rds")
+
+
+# install packages only for first use ----------------------------------------------------------------
+# install.packages('survival')
+# install.packages('survminer')
+# install.packages('interactionR')
+# install.packages('cmprsk')
+# install.packages('ggplot2')
+# install.packages('sjmisc')
+# install.packages('dplyr')
+# install.packages('rms')
+# install.packages('tidyverse')
+# install.packages('lubridate')
+# install.packages('cowplot')
+# install.packages('ggsci')
+# install.packages('ggpubr')
+# install.packages('plyr')
+# install.packages('Rmisc')
+# install.packages('scales')
+# install.packages('psych')
+
+
+# library packages ----------------------------------------------------------------
+library(survival)
+library(survminer)
+library(interactionR)
+library(cmprsk)
+library(ggplot2)
+library(sjmisc)
+library(dplyr)
+library(rms)
+library(tidyverse)
+library(lubridate)
+library(cowplot)
+library(ggsci)
+library(ggpubr)
+library(plyr)
+library(Rmisc)
+library(scales)
+library(psych)
+
+
+# Table 1. Baseline characteristics of the study participants -----------------------------------------------------------------
+FullSample.Imputed.Morning <- FullSample.Imputed[FullSample.Imputed$MVPA1005M400.4gp50==1,]
+FullSample.Imputed.Midday <- FullSample.Imputed[FullSample.Imputed$MVPA1005M400.4gp50==2,]
+FullSample.Imputed.Evening <- FullSample.Imputed[FullSample.Imputed$MVPA1005M400.4gp50==3,]
+FullSample.Imputed.Mixed <- FullSample.Imputed[FullSample.Imputed$MVPA1005M400.4gp50==4,]
+# Full sample baseline Characteristics
+mean(FullSample.Imputed$age.acti)
+sd(FullSample.Imputed$age.acti)
+frq(FullSample.Imputed$sex31)
+frq(FullSample.Imputed$ethnic.white21000.2gp)
+mean(FullSample.Imputed$townsend.deprivation.index189)
+sd(FullSample.Imputed$townsend.deprivation.index189)
+describe(FullSample.Imputed$townsend.deprivation.index189)
+quantile(FullSample.Imputed$townsend.deprivation.index189,c(0.50))
+quantile(FullSample.Imputed$townsend.deprivation.index189,c(0.75)) - quantile(FullSample.Imputed$townsend.deprivation.index189,c(0.25))
+frq(FullSample.Imputed$assessment.centre54)
+frq(FullSample.Imputed$Final_Education_FULL)
+frq(FullSample.Imputed$start.time.of.wear90010.season)
+mean(FullSample.Imputed$Final_Healthy_diet_score_FULL)
+sd(FullSample.Imputed$Final_Healthy_diet_score_FULL)
+frq(FullSample.Imputed$Final_Smoking_status_FULL)
+frq(FullSample.Imputed$Final_Alcohol_frequency_categories_FULL)
+frq(FullSample.Imputed$acc_sleep_dur_AD_mn.3gp)
+frq(FullSample.Imputed$acc_sleep_midp_AD_mn.3gp)
+frq(FullSample.Imputed$Final_Obesity_baseline)
+frq(FullSample.Imputed$all_dm_before_acti)
+frq(FullSample.Imputed$LongstandingIllness.comorbidities.FINAL)
+frq(FullSample.Imputed$Depression.comorbidities.FINAL)
+frq(FullSample.Imputed$CVDs.comorbidities.Baseline)
+frq(FullSample.Imputed$Cancers.comorbidities.FINAL)
+describe(FullSample.Imputed$MVPA1005M400.Weekly.5.23)
+quantile(FullSample.Imputed$MVPA1005M400.Weekly.5.23,c(0.50))
+quantile(FullSample.Imputed$MVPA1005M400.Weekly.5.23,c(0.75)) - quantile(FullSample.Imputed$MVPA1005M400.Weekly.5.23,c(0.25))
+# Morning group baseline characteristics
+mean(FullSample.Imputed.Morning$age.acti)
+sd(FullSample.Imputed.Morning$age.acti)
+frq(FullSample.Imputed.Morning$sex31)
+frq(FullSample.Imputed.Morning$ethnic.white21000.2gp)
+mean(FullSample.Imputed.Morning$townsend.deprivation.index189)
+sd(FullSample.Imputed.Morning$townsend.deprivation.index189)
+describe(FullSample.Imputed.Morning$townsend.deprivation.index189)
+quantile(FullSample.Imputed.Morning$townsend.deprivation.index189,c(0.50))
+quantile(FullSample.Imputed.Morning$townsend.deprivation.index189,c(0.75)) - quantile(FullSample.Imputed.Morning$townsend.deprivation.index189,c(0.25))
+frq(FullSample.Imputed.Morning$assessment.centre54)
+frq(FullSample.Imputed.Morning$Final_Education_FULL)
+frq(FullSample.Imputed.Morning$start.time.of.wear90010.season)
+mean(FullSample.Imputed.Morning$Final_Healthy_diet_score_FULL)
+sd(FullSample.Imputed.Morning$Final_Healthy_diet_score_FULL)
+frq(FullSample.Imputed.Morning$Final_Smoking_status_FULL)
+frq(FullSample.Imputed.Morning$Final_Alcohol_frequency_categories_FULL)
+frq(FullSample.Imputed.Morning$acc_sleep_dur_AD_mn.3gp)
+frq(FullSample.Imputed.Morning$acc_sleep_midp_AD_mn.3gp)
+frq(FullSample.Imputed.Morning$Final_Obesity_baseline)
+frq(FullSample.Imputed.Morning$all_dm_before_acti)
+frq(FullSample.Imputed.Morning$LongstandingIllness.comorbidities.FINAL)
+frq(FullSample.Imputed.Morning$Depression.comorbidities.FINAL)
+frq(FullSample.Imputed.Morning$CVDs.comorbidities.Baseline)
+frq(FullSample.Imputed.Morning$Cancers.comorbidities.FINAL)
+describe(FullSample.Imputed.Morning$MVPA1005M400.Weekly.5.23)
+quantile(FullSample.Imputed.Morning$MVPA1005M400.Weekly.5.23,c(0.50))
+quantile(FullSample.Imputed.Morning$MVPA1005M400.Weekly.5.23,c(0.75)) - quantile(FullSample.Imputed.Morning$MVPA1005M400.Weekly.5.23,c(0.25))
+# Midday-afternoon group baseline characteristics
+mean(FullSample.Imputed.Midday$age.acti)
+sd(FullSample.Imputed.Midday$age.acti)
+frq(FullSample.Imputed.Midday$sex31)
+frq(FullSample.Imputed.Midday$ethnic.white21000.2gp)
+mean(FullSample.Imputed.Midday$townsend.deprivation.index189)
+sd(FullSample.Imputed.Midday$townsend.deprivation.index189)
+describe(FullSample.Imputed.Midday$townsend.deprivation.index189)
+quantile(FullSample.Imputed.Midday$townsend.deprivation.index189,c(0.50))
+quantile(FullSample.Imputed.Midday$townsend.deprivation.index189,c(0.75)) - quantile(FullSample.Imputed.Midday$townsend.deprivation.index189,c(0.25))
+frq(FullSample.Imputed.Midday$assessment.centre54)
+frq(FullSample.Imputed.Midday$Final_Education_FULL)
+frq(FullSample.Imputed.Midday$start.time.of.wear90010.season)
+mean(FullSample.Imputed.Midday$Final_Healthy_diet_score_FULL)
+sd(FullSample.Imputed.Midday$Final_Healthy_diet_score_FULL)
+frq(FullSample.Imputed.Midday$Final_Smoking_status_FULL)
+frq(FullSample.Imputed.Midday$Final_Alcohol_frequency_categories_FULL)
+frq(FullSample.Imputed.Midday$acc_sleep_dur_AD_mn.3gp)
+frq(FullSample.Imputed.Midday$acc_sleep_midp_AD_mn.3gp)
+frq(FullSample.Imputed.Midday$Final_Obesity_baseline)
+frq(FullSample.Imputed.Midday$all_dm_before_acti)
+frq(FullSample.Imputed.Midday$LongstandingIllness.comorbidities.FINAL)
+frq(FullSample.Imputed.Midday$Depression.comorbidities.FINAL)
+frq(FullSample.Imputed.Midday$CVDs.comorbidities.Baseline)
+frq(FullSample.Imputed.Midday$Cancers.comorbidities.FINAL)
+describe(FullSample.Imputed.Midday$MVPA1005M400.Weekly.5.23)
+quantile(FullSample.Imputed.Midday$MVPA1005M400.Weekly.5.23,c(0.50))
+quantile(FullSample.Imputed.Midday$MVPA1005M400.Weekly.5.23,c(0.75)) - quantile(FullSample.Imputed.Midday$MVPA1005M400.Weekly.5.23,c(0.25))
+# Evening group baseline characteristics
+mean(FullSample.Imputed.Evening$age.acti)
+sd(FullSample.Imputed.Evening$age.acti)
+frq(FullSample.Imputed.Evening$sex31)
+frq(FullSample.Imputed.Evening$ethnic.white21000.2gp)
+mean(FullSample.Imputed.Evening$townsend.deprivation.index189)
+sd(FullSample.Imputed.Evening$townsend.deprivation.index189)
+describe(FullSample.Imputed.Evening$townsend.deprivation.index189)
+quantile(FullSample.Imputed.Evening$townsend.deprivation.index189,c(0.50))
+quantile(FullSample.Imputed.Evening$townsend.deprivation.index189,c(0.75)) - quantile(FullSample.Imputed.Evening$townsend.deprivation.index189,c(0.25))
+frq(FullSample.Imputed.Evening$assessment.centre54)
+frq(FullSample.Imputed.Evening$Final_Education_FULL)
+frq(FullSample.Imputed.Evening$start.time.of.wear90010.season)
+mean(FullSample.Imputed.Evening$Final_Healthy_diet_score_FULL)
+sd(FullSample.Imputed.Evening$Final_Healthy_diet_score_FULL)
+frq(FullSample.Imputed.Evening$Final_Smoking_status_FULL)
+frq(FullSample.Imputed.Evening$Final_Alcohol_frequency_categories_FULL)
+frq(FullSample.Imputed.Evening$acc_sleep_dur_AD_mn.3gp)
+frq(FullSample.Imputed.Evening$acc_sleep_midp_AD_mn.3gp)
+frq(FullSample.Imputed.Evening$Final_Obesity_baseline)
+frq(FullSample.Imputed.Evening$all_dm_before_acti)
+frq(FullSample.Imputed.Evening$LongstandingIllness.comorbidities.FINAL)
+frq(FullSample.Imputed.Evening$Depression.comorbidities.FINAL)
+frq(FullSample.Imputed.Evening$CVDs.comorbidities.Baseline)
+frq(FullSample.Imputed.Evening$Cancers.comorbidities.FINAL)
+describe(FullSample.Imputed.Evening$MVPA1005M400.Weekly.5.23)
+quantile(FullSample.Imputed.Evening$MVPA1005M400.Weekly.5.23,c(0.50))
+quantile(FullSample.Imputed.Evening$MVPA1005M400.Weekly.5.23,c(0.75)) - quantile(FullSample.Imputed.Evening$MVPA1005M400.Weekly.5.23,c(0.25))
+# Mixed group baseline characteristics
+mean(FullSample.Imputed.Mixed$age.acti)
+sd(FullSample.Imputed.Mixed$age.acti)
+frq(FullSample.Imputed.Mixed$sex31)
+frq(FullSample.Imputed.Mixed$ethnic.white21000.2gp)
+mean(FullSample.Imputed.Mixed$townsend.deprivation.index189)
+sd(FullSample.Imputed.Mixed$townsend.deprivation.index189)
+describe(FullSample.Imputed.Mixed$townsend.deprivation.index189)
+quantile(FullSample.Imputed.Mixed$townsend.deprivation.index189,c(0.50))
+quantile(FullSample.Imputed.Mixed$townsend.deprivation.index189,c(0.75)) - quantile(FullSample.Imputed.Mixed$townsend.deprivation.index189,c(0.25))
+frq(FullSample.Imputed.Mixed$assessment.centre54)
+frq(FullSample.Imputed.Mixed$Final_Education_FULL)
+frq(FullSample.Imputed.Mixed$start.time.of.wear90010.season)
+mean(FullSample.Imputed.Mixed$Final_Healthy_diet_score_FULL)
+sd(FullSample.Imputed.Mixed$Final_Healthy_diet_score_FULL)
+frq(FullSample.Imputed.Mixed$Final_Smoking_status_FULL)
+frq(FullSample.Imputed.Mixed$Final_Alcohol_frequency_categories_FULL)
+frq(FullSample.Imputed.Mixed$acc_sleep_dur_AD_mn.3gp)
+frq(FullSample.Imputed.Mixed$acc_sleep_midp_AD_mn.3gp)
+frq(FullSample.Imputed.Mixed$Final_Obesity_baseline)
+frq(FullSample.Imputed.Mixed$all_dm_before_acti)
+frq(FullSample.Imputed.Mixed$LongstandingIllness.comorbidities.FINAL)
+frq(FullSample.Imputed.Mixed$Depression.comorbidities.FINAL)
+frq(FullSample.Imputed.Mixed$CVDs.comorbidities.Baseline)
+frq(FullSample.Imputed.Mixed$Cancers.comorbidities.FINAL)
+describe(FullSample.Imputed.Mixed$MVPA1005M400.Weekly.5.23)
+quantile(FullSample.Imputed.Mixed$MVPA1005M400.Weekly.5.23,c(0.50))
+quantile(FullSample.Imputed.Mixed$MVPA1005M400.Weekly.5.23,c(0.75)) - quantile(FullSample.Imputed.Mixed$MVPA1005M400.Weekly.5.23,c(0.25))
+
+
+
+#Table 2. The associations between timing of MVPA and mortality risk------------------------------------------
+#model 3
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 2
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 1
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+
+
+
+# Table 3. Sensitivity analysis on the associations between timing of MVPA and mortality risk by using different cutoffs for timing group assignment --------
+# MVPA1005M400.4gp55-----
+#model 3
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 2
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 1
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp55 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+
+# MVPA1005M400.4gp60-----
+#model 3
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 2
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 1
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp60 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+
+# MVPA1005M400.4gp65 -----
+#model 3
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 2
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 1
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp65 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+
+# MVPA1005M400.4gp70 ------
+#model 3
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 2
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 1
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp70 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+
+
+# Notes for Figure 2: data were from supplementary table 14-15------------------------------------------
+
+# Supplementary fig 2. The exploratory analysis on the associations between timing of MVPA and mortality risk-----------------------------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.10gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.10gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.10gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+
+
+# Supplementary table 3. Baseline characteristics of overall sample and complete case sample -----------------------------------------------------------------
+# Complete Sample
+mean(CompleteSample$age.acti)
+sd(CompleteSample$age.acti)
+frq(CompleteSample$sex31)
+frq(CompleteSample$ethnic.white21000.2gp)
+mean(CompleteSample$townsend.deprivation.index189)
+sd(CompleteSample$townsend.deprivation.index189)
+describe(CompleteSample$townsend.deprivation.index189)
+quantile(CompleteSample$townsend.deprivation.index189,c(0.50))
+quantile(CompleteSample$townsend.deprivation.index189,c(0.75)) - quantile(CompleteSample$townsend.deprivation.index189,c(0.25))
+frq(CompleteSample$assessment.centre54)
+frq(CompleteSample$Final_Education_FULL)
+frq(CompleteSample$start.time.of.wear90010.season)
+mean(CompleteSample$Final_Healthy_diet_score_FULL)
+sd(CompleteSample$Final_Healthy_diet_score_FULL)
+frq(CompleteSample$Final_Smoking_status_FULL)
+frq(CompleteSample$Final_Alcohol_frequency_categories_FULL)
+frq(CompleteSample$acc_sleep_dur_AD_mn.3gp)
+frq(CompleteSample$acc_sleep_midp_AD_mn.3gp)
+frq(CompleteSample$Final_Obesity_baseline)
+frq(CompleteSample$all_dm_before_acti)
+frq(CompleteSample$LongstandingIllness.comorbidities.FINAL)
+frq(CompleteSample$Depression.comorbidities.FINAL)
+frq(CompleteSample$CVDs.comorbidities.Baseline)
+frq(CompleteSample$Cancers.comorbidities.FINAL)
+describe(CompleteSample$MVPA1005M400.Weekly.5.23)
+quantile(CompleteSample$MVPA1005M400.Weekly.5.23,c(0.50))
+quantile(CompleteSample$MVPA1005M400.Weekly.5.23,c(0.75)) - quantile(CompleteSample$MVPA1005M400.Weekly.5.23,c(0.25))
+# overall/full sample baseline Characteristics
+mean(FullSample.Imputed$age.acti)
+sd(FullSample.Imputed$age.acti)
+frq(FullSample.Imputed$sex31)
+frq(FullSample.Imputed$ethnic.white21000.2gp)
+mean(FullSample.Imputed$townsend.deprivation.index189)
+sd(FullSample.Imputed$townsend.deprivation.index189)
+describe(FullSample.Imputed$townsend.deprivation.index189)
+quantile(FullSample.Imputed$townsend.deprivation.index189,c(0.50))
+quantile(FullSample.Imputed$townsend.deprivation.index189,c(0.75)) - quantile(FullSample.Imputed$townsend.deprivation.index189,c(0.25))
+frq(FullSample.Imputed$assessment.centre54)
+frq(FullSample.Imputed$Final_Education_FULL)
+frq(FullSample.Imputed$start.time.of.wear90010.season)
+mean(FullSample.Imputed$Final_Healthy_diet_score_FULL)
+sd(FullSample.Imputed$Final_Healthy_diet_score_FULL)
+frq(FullSample.Imputed$Final_Smoking_status_FULL)
+frq(FullSample.Imputed$Final_Alcohol_frequency_categories_FULL)
+frq(FullSample.Imputed$acc_sleep_dur_AD_mn.3gp)
+frq(FullSample.Imputed$acc_sleep_midp_AD_mn.3gp)
+frq(FullSample.Imputed$Final_Obesity_baseline)
+frq(FullSample.Imputed$all_dm_before_acti)
+frq(FullSample.Imputed$LongstandingIllness.comorbidities.FINAL)
+frq(FullSample.Imputed$Depression.comorbidities.FINAL)
+frq(FullSample.Imputed$CVDs.comorbidities.Baseline)
+frq(FullSample.Imputed$Cancers.comorbidities.FINAL)
+describe(FullSample.Imputed$MVPA1005M400.Weekly.5.23)
+quantile(FullSample.Imputed$MVPA1005M400.Weekly.5.23,c(0.50))
+quantile(FullSample.Imputed$MVPA1005M400.Weekly.5.23,c(0.75)) - quantile(FullSample.Imputed$MVPA1005M400.Weekly.5.23,c(0.25))
+
+
+
+#Supplementary table 4. Sensitivity analysis on the associations between timing of MVPA and mortality risk by using competing risk regression (Fine and Gray)---
+library(cmprsk)
+library(aod)
+library(survival)
+library(rms)
+library(foreign)
+
+attach(FullSample.Imputed)
+#generate new outcome variables for competing risk regression models--
+FullSample.Imputed$Incidental.acti.CVDcmp.Mortality.ICD10[Incidental.acti.CVD.Mortality.ICD10 == 0 & Incidental.acti.AllCause.Mortality.ICD10 == 1] <- 2
+FullSample.Imputed$Incidental.acti.CVDcmp.Mortality.ICD10[Incidental.acti.CVD.Mortality.ICD10 == 0 & Incidental.acti.AllCause.Mortality.ICD10 == 0] <- 0
+FullSample.Imputed$Incidental.acti.CVDcmp.Mortality.ICD10[Incidental.acti.CVD.Mortality.ICD10 == 1] <- 1
+FullSample.Imputed$Incidental.acti.CVDcmp.Mortality.ICD10 <- as.factor(FullSample.Imputed$Incidental.acti.CVDcmp.Mortality.ICD10)
+frq(FullSample.Imputed$Incidental.acti.CVD.Mortality.ICD10)
+frq(FullSample.Imputed$Incidental.acti.CVDcmp.Mortality.ICD10)
+
+FullSample.Imputed$Incidental.acti.Cancercmp.Mortality.ICD10[Incidental.acti.Cancer.Mortality.ICD10 == 0 & Incidental.acti.AllCause.Mortality.ICD10 == 1] <- 2
+FullSample.Imputed$Incidental.acti.Cancercmp.Mortality.ICD10[Incidental.acti.Cancer.Mortality.ICD10 == 0 & Incidental.acti.AllCause.Mortality.ICD10 == 0] <- 0
+FullSample.Imputed$Incidental.acti.Cancercmp.Mortality.ICD10[Incidental.acti.Cancer.Mortality.ICD10 == 1] <- 1
+FullSample.Imputed$Incidental.acti.Cancercmp.Mortality.ICD10 <- as.factor(FullSample.Imputed$Incidental.acti.Cancercmp.Mortality.ICD10)
+frq(FullSample.Imputed$Incidental.acti.Cancer.Mortality.ICD10)
+frq(FullSample.Imputed$Incidental.acti.Cancercmp.Mortality.ICD10)
+
+# generate covariate models --------------------------------------------------------------
+# model 1
+cov.model1.MVPA1005M400 <- data.frame(MVPA1005M400.4gp502 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 2, 1, 0),
+                                      MVPA1005M400.4gp503 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 3, 1, 0),
+                                      MVPA1005M400.4gp504 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 4, 1, 0),
+                                      age.acti = FullSample.Imputed$age.acti,
+                                      sex31 = FullSample.Imputed$sex31)
+
+str(cov.model1.MVPA1005M400)
+
+# model 2
+cov.model2.MVPA1005M400 <- data.frame(MVPA1005M400.4gp502 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 2, 1, 0),
+                                      MVPA1005M400.4gp503 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 3, 1, 0),
+                                      MVPA1005M400.4gp504 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 4, 1, 0),
+                                      age.acti = FullSample.Imputed$age.acti,
+                                      sex31 = FullSample.Imputed$sex31,
+                                      ethnic.white21000.2gp = FullSample.Imputed$ethnic.white21000.2gp,
+                                      townsend.deprivation.index189 = FullSample.Imputed$townsend.deprivation.index189,
+                                      assessment.centre542 = ifelse(FullSample.Imputed$assessment.centre54 == 2, 1, 0),
+                                      assessment.centre543 = ifelse(FullSample.Imputed$assessment.centre54 == 3, 1, 0),
+                                      Final_Education_FULL2 = ifelse(FullSample.Imputed$Final_Education_FULL == 2, 1, 0),
+                                      Final_Education_FULL3 = ifelse(FullSample.Imputed$Final_Education_FULL == 3, 1, 0),
+                                      start.time.of.wear90010.season2 = ifelse(FullSample.Imputed$start.time.of.wear90010.season == 2, 1, 0),
+                                      start.time.of.wear90010.season3 = ifelse(FullSample.Imputed$start.time.of.wear90010.season == 3, 1, 0),
+                                      start.time.of.wear90010.season4 = ifelse(FullSample.Imputed$start.time.of.wear90010.season == 4, 1, 0),
+                                      Final_Healthy_diet_score_FULL = FullSample.Imputed$Final_Healthy_diet_score_FULL,
+                                      Final_Smoking_status_FULL1 = ifelse(FullSample.Imputed$Final_Smoking_status_FULL == 1, 1, 0),
+                                      Final_Smoking_status_FULL2 = ifelse(FullSample.Imputed$Final_Smoking_status_FULL == 2, 1, 0),
+                                      Final_Alcohol_frequency_categories_FULL2 = ifelse(FullSample.Imputed$Final_Alcohol_frequency_categories_FULL == 2, 1, 0),
+                                      Final_Alcohol_frequency_categories_FULL3 = ifelse(FullSample.Imputed$Final_Alcohol_frequency_categories_FULL == 3, 1, 0))
+
+str(cov.model2.MVPA1005M400)
+# model 3
+cov.model3.MVPA1005M400 <- data.frame(MVPA1005M400.4gp502 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 2, 1, 0),
+                                      MVPA1005M400.4gp503 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 3, 1, 0),
+                                      MVPA1005M400.4gp504 = ifelse(FullSample.Imputed$MVPA1005M400.4gp50 == 4, 1, 0),
+                                      age.acti = FullSample.Imputed$age.acti,
+                                      sex31 = FullSample.Imputed$sex31,
+                                      ethnic.white21000.2gp = FullSample.Imputed$ethnic.white21000.2gp,
+                                      townsend.deprivation.index189 = FullSample.Imputed$townsend.deprivation.index189,
+                                      assessment.centre542 = ifelse(FullSample.Imputed$assessment.centre54 == 2, 1, 0),
+                                      assessment.centre543 = ifelse(FullSample.Imputed$assessment.centre54 == 3, 1, 0),
+                                      Final_Education_FULL2 = ifelse(FullSample.Imputed$Final_Education_FULL == 2, 1, 0),
+                                      Final_Education_FULL3 = ifelse(FullSample.Imputed$Final_Education_FULL == 3, 1, 0),
+                                      start.time.of.wear90010.season2 = ifelse(FullSample.Imputed$start.time.of.wear90010.season == 2, 1, 0),
+                                      start.time.of.wear90010.season3 = ifelse(FullSample.Imputed$start.time.of.wear90010.season == 3, 1, 0),
+                                      start.time.of.wear90010.season4 = ifelse(FullSample.Imputed$start.time.of.wear90010.season == 4, 1, 0),
+                                      Final_Healthy_diet_score_FULL = FullSample.Imputed$Final_Healthy_diet_score_FULL,
+                                      Final_Smoking_status_FULL1 = ifelse(FullSample.Imputed$Final_Smoking_status_FULL == 1, 1, 0),
+                                      Final_Smoking_status_FULL2 = ifelse(FullSample.Imputed$Final_Smoking_status_FULL == 2, 1, 0),
+                                      Final_Alcohol_frequency_categories_FULL2 = ifelse(FullSample.Imputed$Final_Alcohol_frequency_categories_FULL == 2, 1, 0),
+                                      Final_Alcohol_frequency_categories_FULL3 = ifelse(FullSample.Imputed$Final_Alcohol_frequency_categories_FULL == 3, 1, 0),
+                                      acc_sleep_dur_AD_mn.3gp2 = ifelse(FullSample.Imputed$acc_sleep_dur_AD_mn.3gp == 2, 1, 0),
+                                      acc_sleep_dur_AD_mn.3gp3 = ifelse(FullSample.Imputed$acc_sleep_dur_AD_mn.3gp == 3, 1, 0),
+                                      acc_sleep_midp_AD_mn.3gp2 = ifelse(FullSample.Imputed$acc_sleep_midp_AD_mn.3gp == 2, 1, 0),
+                                      acc_sleep_midp_AD_mn.3gp3 = ifelse(FullSample.Imputed$acc_sleep_midp_AD_mn.3gp == 3, 1, 0),
+                                      MVPA1005M400.Weekly.5.23 = FullSample.Imputed$MVPA1005M400.Weekly.5.23)
+
+
+str(cov.model3.MVPA1005M400)
+
+# competing risk model 3 -----------------------------------
+mod <- crr(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVDcmp.Mortality.ICD10, cov.model3.MVPA1005M400, failcode= 1, cencode= 0)
+summary(mod)
+rm(mod)
+mod <- crr(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancercmp.Mortality.ICD10, cov.model3.MVPA1005M400, failcode= 1, cencode= 0)
+summary(mod)
+rm(mod)
+# competing risk model 2 -----------------------------------
+mod <- crr(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVDcmp.Mortality.ICD10, cov.model2.MVPA1005M400, failcode= 1, cencode= 0)
+summary(mod)
+rm(mod)
+mod <- crr(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancercmp.Mortality.ICD10, cov.model2.MVPA1005M400, failcode= 1, cencode= 0)
+summary(mod)
+rm(mod)
+# competing risk model 1 -----------------------------------
+mod <- crr(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVDcmp.Mortality.ICD10, cov.model1.MVPA1005M400, failcode= 1, cencode= 0)
+summary(mod)
+rm(mod)
+mod <- crr(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancercmp.Mortality.ICD10, cov.model1.MVPA1005M400, failcode= 1, cencode= 0)
+summary(mod)
+rm(mod)
+
+
+
+# Supplementary table 5. Sensitivity analysis on the associations between timing of MVPA and mortality risk by using the dataset without imputation ----------------------------------------------
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = CompleteSample);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = CompleteSample);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = CompleteSample);summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = CompleteSample);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = CompleteSample);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = CompleteSample);summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = CompleteSample);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = CompleteSample);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = CompleteSample);summary(cox.RA.FullAdjusted)
+
+
+
+#Supplementary table 6. Sensitivity analysis on the associations between timing of MVPA and mortality risk by excluding participants with shift work history-------
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, SW_history != 1));summary(cox.RA.FullAdjusted)
+
+
+
+#Supplementary table 7. Sensitivity analysis on the associations between timing of MVPA and mortality risk by excluding participants who wore accelerometers during the daylight saving time transition
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, is.na(FullSample.Imputed$Exclued.Acti.DST)));summary(cox.RA.FullAdjusted)
+
+
+#Supplementary table 9. Sensitivity analysis on the associations between timing of MVPA and mortality risk by additionally adjusting for health-related variables potentially on the causal pathway ------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23 + Final_Obesity_baseline + all_dm_before_acti + LongstandingIllness.comorbidities.FINAL +  Depression.comorbidities.FINAL + CVDs.comorbidities.Baseline + Cancers.comorbidities.FINAL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23 + Final_Obesity_baseline + all_dm_before_acti + LongstandingIllness.comorbidities.FINAL +  Depression.comorbidities.FINAL + CVDs.comorbidities.Baseline + Cancers.comorbidities.FINAL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23 + Final_Obesity_baseline + all_dm_before_acti + LongstandingIllness.comorbidities.FINAL +  Depression.comorbidities.FINAL + CVDs.comorbidities.Baseline + Cancers.comorbidities.FINAL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+
+
+
+#Supplementary table 10. Sensitivity analysis on the associations between timing of MVPA and mortality risk by excluding events within the first year of follow-up----
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, !(FUduration.acti.AllCause.Mortality.ICD10 < 365.25 & Incidental.acti.AllCause.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, !(FUduration.acti.CVD.Mortality.ICD10 < 365.25 & Incidental.acti.CVD.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = subset(FullSample.Imputed, !(FUduration.acti.Cancer.Mortality.ICD10 < 365.25 & Incidental.acti.Cancer.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, !(FUduration.acti.AllCause.Mortality.ICD10 < 365.25 & Incidental.acti.AllCause.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, !(FUduration.acti.CVD.Mortality.ICD10 < 365.25 & Incidental.acti.CVD.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = subset(FullSample.Imputed, !(FUduration.acti.Cancer.Mortality.ICD10 < 365.25 & Incidental.acti.Cancer.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, !(FUduration.acti.AllCause.Mortality.ICD10 < 365.25 & Incidental.acti.AllCause.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, !(FUduration.acti.CVD.Mortality.ICD10 < 365.25 & Incidental.acti.CVD.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = subset(FullSample.Imputed, !(FUduration.acti.Cancer.Mortality.ICD10 < 365.25 & Incidental.acti.Cancer.Mortality.ICD10 == 1)));summary(cox.RA.FullAdjusted)
+
+
+#Supplementary table 11. Sensitivity analysis on the associations between timing of MVPA and mortality risk by censoring up to Dec 31, 2019------
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10.COVID , Incidental.acti.AllCause.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10.COVID , Incidental.acti.CVD.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10.COVID , Incidental.acti.Cancer.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10.COVID , Incidental.acti.AllCause.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10.COVID , Incidental.acti.CVD.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10.COVID , Incidental.acti.Cancer.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10.COVID , Incidental.acti.AllCause.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10.COVID , Incidental.acti.CVD.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10.COVID , Incidental.acti.Cancer.Mortality.ICD10.COVID) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed);summary(cox.RA.FullAdjusted)
+
+
+
+#Supplementary table 12. Sensitivity analysis on the associations between timing of MVPA and mortality risk by using the subsample with ≥6 days of accelerometer wear----
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.4gp50 + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$wear.duration.overall90051 > 6,]);summary(cox.RA.FullAdjusted)
+
+
+# Supplementary table 13.  Interaction effects of timing of MVPA and age categories (< 65 and ≥ 65 years) on mortality risk --------
+
+# MVPA timing & age interaction analyses ----------------------------------------------------
+library(interactionR)
+# age.acti.2gp65 -------------------------------------------------------------------------
+#model 3 ----------
+cox.RA.FullAdjusted.all <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp.rev*age.acti.2gp65 + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted.all)
+table_object = interactionR(cox.RA.FullAdjusted.all, exposure_names = c("MVPA1005M400.2gp.rev", "age.acti.2gp65"), ci.type = "delta", ci.level = 0.95, em = FALSE, recode = F);table_object$dframe 
+cox.RA.FullAdjusted.cvd <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp.rev*age.acti.2gp65 + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted.cvd)
+table_object = interactionR(cox.RA.FullAdjusted.cvd, exposure_names = c("MVPA1005M400.2gp.rev", "age.acti.2gp65"), ci.type = "delta", ci.level = 0.95, em = FALSE, recode = F);table_object$dframe 
+cox.RA.FullAdjusted.cancer <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp.rev*age.acti.2gp65 + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted.cancer)
+table_object = interactionR(cox.RA.FullAdjusted.cancer, exposure_names = c("MVPA1005M400.2gp.rev", "age.acti.2gp65"), ci.type = "delta", ci.level = 0.95, em = FALSE, recode = F);table_object$dframe 
+
+
+# Supplementary table 14. Interaction effects of timing of MVPA and sex on mortality risk --------
+# MVPA timing & sex interaction analyses ----------------------------------------------------
+#model 3 ----------
+cox.RA.FullAdjusted.all <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp.rev*sex31 + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted.all)
+table_object = interactionR(cox.RA.FullAdjusted.all, exposure_names = c("MVPA1005M400.2gp.rev", "sex31"), ci.type = "delta", ci.level = 0.95, em = FALSE, recode = F);table_object$dframe 
+cox.RA.FullAdjusted.cvd <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp.rev*sex31 + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted.cvd)
+table_object = interactionR(cox.RA.FullAdjusted.cvd, exposure_names = c("MVPA1005M400.2gp.rev", "sex31"), ci.type = "delta", ci.level = 0.95, em = FALSE, recode = F);table_object$dframe 
+cox.RA.FullAdjusted.cancer <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp.rev*sex31 + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed);summary(cox.RA.FullAdjusted.cancer)
+table_object = interactionR(cox.RA.FullAdjusted.cancer, exposure_names = c("MVPA1005M400.2gp.rev", "sex31"), ci.type = "delta", ci.level = 0.95, em = FALSE, recode = F);table_object$dframe 
+
+
+# Supplementary table 18. Subgroup analysis on the associations between timing of MVPA and mortality risk stratified by age categories (< 65 and ≥ 65 years)
+# age < 65 years subgroup----------------------
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 1,]);summary(cox.RA.FullAdjusted)
+
+# age ≥ 65 years subgroup----------------------
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31 + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + sex31, data = FullSample.Imputed[FullSample.Imputed$age.acti.2gp65 == 2,]);summary(cox.RA.FullAdjusted)
+
+
+
+# Supplementary table 19. Subgroup analysis on the associations between timing of MVPA and mortality risk stratified by sex---------
+# female subgroup----------------------
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti, data = FullSample.Imputed[FullSample.Imputed$sex31 == 0,]);summary(cox.RA.FullAdjusted)
+
+# male subgroup----------------------
+#model 3 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL + acc_sleep_dur_AD_mn.3gp + acc_sleep_midp_AD_mn.3gp + MVPA1005M400.Weekly.5.23, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
+#model 2 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti + ethnic.white21000.2gp + townsend.deprivation.index189 + assessment.centre54 + Final_Education_FULL + start.time.of.wear90010.season + Final_Healthy_diet_score_FULL + Final_Smoking_status_FULL + Final_Alcohol_frequency_categories_FULL, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
+#model 1 ----------
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.AllCause.Mortality.ICD10, Incidental.acti.AllCause.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.CVD.Mortality.ICD10, Incidental.acti.CVD.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
+cox.RA.FullAdjusted <- coxph(Surv(FUduration.acti.Cancer.Mortality.ICD10, Incidental.acti.Cancer.Mortality.ICD10) ~ MVPA1005M400.2gp + age.acti, data = FullSample.Imputed[FullSample.Imputed$sex31 == 1,]);summary(cox.RA.FullAdjusted)
